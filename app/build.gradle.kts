@@ -30,8 +30,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8 // The library uses 1.8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
-        jvmTarget = "1.8" // Match Java compatibility
+        jvmTarget = "1.8" // Or your desired Java version, matching compileOptions
     }
     buildFeatures {
         viewBinding = true // Enable ViewBinding for easier UI access
@@ -61,4 +62,9 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }

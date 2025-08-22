@@ -1,6 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ADBTest</string>
-    <string name="port">Port</string>
     <string name="host_ip_address">Host IP Address</string>
     <string name="connect_and_run_test">Connect and Run Test</string>
     <string name="output_will_appear_here">Output will appear here</string>

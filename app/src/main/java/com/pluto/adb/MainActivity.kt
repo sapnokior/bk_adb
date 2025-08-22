@@ -2,6 +2,8 @@
 package com.pluto.adb
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -24,17 +26,15 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.connectButton.setOnClickListener {
-            val originalHost = binding.hostEditText.text.toString()
-            val host = originalHost.replace("\\s".toRegex(), "")
-            val port = binding.portEditText.text.toString().toIntOrNull()
-
-            if (host.isNotBlank() && port != null) {
-                connectAndRunAutomator(host, port)
-            } else {
-                binding.outputTextView.text = "Please enter a valid host and port."
-            }
+        val serviceIntent = Intent(this, BackgroundService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent)
+        } else {
+            startService(serviceIntent)
         }
+
+        connectAndRunAutomator("localhost", 5555)
+
     }
 
     @SuppressLint("SetTextI18n")
@@ -80,11 +80,11 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun runUiAutomatorTest(adbManager: AbsAdbConnectionManager) {
         withContext(Dispatchers.Main) {
-            binding.outputTextView.append("\nRunning uiautomator test...")
+            binding.outputTextView.append("\nRunning commands...")
         }
 
         try {
-            val command = "uiautomator dump /sdcard/out.xml"
+            val command = "/data/app/~~Q16VwAj686rEmIllKCGhxg==/moe.shizuku.privileged.api-SreNStL3MSajSke9Rb-mWQ==/lib/arm64/libshizuku.so"
             val stream = withContext(Dispatchers.IO) {
                 adbManager.openStream("shell:$command")
             }
@@ -95,20 +95,17 @@ class MainActivity : AppCompatActivity() {
                 reader.useLines { lines ->
                     lines.forEach { line ->
                         output.append(line).append("\n")
-                        Log.d("UiAutomatorOutput", line)
+                        withContext(Dispatchers.Main) {
+                            binding.outputTextView.append(line+"\n")
+                        }
                     }
                 }
             }
 
-            withContext(Dispatchers.Main) {
-                binding.outputTextView.append("\nTest output:\n$output")
-            }
+
 
         } catch (e: Exception) {
             Log.e("AdbAutomator", "Error running uiautomator test", e)
-            withContext(Dispatchers.Main) {
-                binding.outputTextView.append("\nError running test: ${e.message}")
-            }
         }
     }
 }
