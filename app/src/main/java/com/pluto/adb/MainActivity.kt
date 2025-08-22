@@ -33,12 +33,14 @@ class MainActivity : AppCompatActivity() {
             startService(serviceIntent)
         }
 
-        connectAndRunAutomator("localhost", 5555)
+        connectAndRunAutomator()
 
     }
 
     @SuppressLint("SetTextI18n")
-    private fun connectAndRunAutomator(host: String, port: Int) {
+    private fun connectAndRunAutomator() {
+        val host = "localhost"
+        val port = 5555
         lifecycleScope.launch {
             binding.outputTextView.text = "Attempting to connect to $host:$port..."
             try {
